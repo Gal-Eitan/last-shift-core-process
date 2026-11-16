@@ -25,6 +25,9 @@ public class NursePlayerController : MonoBehaviour
     [Tooltip("Reference to the Interact Action (Button)")]
     public InputActionReference interactAction;
 
+    [Header("Item Holding")]
+    [SerializeField] private Transform holdItemPoint;
+
     Rigidbody2D rb;
     Animator anim;
     SpriteRenderer sr;
@@ -65,8 +68,16 @@ public class NursePlayerController : MonoBehaviour
             
             if (move.sqrMagnitude > 1f) move.Normalize();
             
-            if (move.x > 0.01f) sr.flipX = false;
-            else if (move.x < -0.01f) sr.flipX = true;
+           if (move.x > 0.01f)
+            {
+                sr.flipX = false;
+                UpdateHoldPoint(false);
+            }
+            else if (move.x < -0.01f)
+            {
+                sr.flipX = true;
+                UpdateHoldPoint(true);
+            }
             
             if (InteractPressed()) StartInteract();
         }
@@ -81,13 +92,19 @@ public class NursePlayerController : MonoBehaviour
     public void StartInteract()
     {
         lockTimer = interactDuration;
+
         anim.SetTrigger("Interact");
+
+    // Trigger the interaction once, at the correct
+    // point in the animation.
+        CancelInvoke(nameof(FireInteract));
         Invoke(nameof(FireInteract), interactFireTime);
-        onInteract.Invoke();
     }
 
-    void FireInteract() { onInteract?.Invoke(); }
-
+    private void FireInteract()
+    {
+        onInteract?.Invoke();
+    }
     Vector2 ReadMove()
     {
         if (moveAction == null || moveAction.action == null) return Vector2.zero;
@@ -111,4 +128,16 @@ public class NursePlayerController : MonoBehaviour
         // WasPressedThisFrame replaces Input.GetKeyDown
         return interactAction.action.WasPressedThisFrame();
     }
+
+    private void UpdateHoldPoint(bool facingLeft)
+{
+    if (holdItemPoint == null)
+        return;
+
+    Vector3 position = holdItemPoint.localPosition;
+
+    position.x = Mathf.Abs(position.x) * (facingLeft ? -1f : 1f);
+
+    holdItemPoint.localPosition = position;
+}
 }

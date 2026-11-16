@@ -1,12 +1,15 @@
-## itch.io: https://gal-eitan.itch.io/last-shift-level-demo
+# last-shift-core-process
+The core process of Last Shift
 
-## Project structure and what was added:
-The project features a demo level for our game, Last Shift.
+## Controls
+- Move with WASD
+- Pick up items with E when you're near them
 
-## Assignment requirements: 
-- The main scene is level-demo
-- Collision (Done with walls and items)
-- Prefabs (See prefab folder)
-- Spawning done with the item_spawner prefab
-- Mobile settings can be found in level-demo/Canvas/mobileControls
-- Screen management is done via a singleton pattern, which is found in the prefab WinLossManager
+## Win Condition
+- Make it to the end of the shift without running out of hunger and wakefulness (Blue and yellow bars)
+
+## Lost Condition
+- Run out of either hunger or wakefulness
+
+## itch.io:
+https://gal-eitan.itch.io/last-shift-core-process

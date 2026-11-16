@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "last-shift-level-demo.slnx"
+    "dotnet.defaultSolution": "last-shift-core-process.slnx"
 }

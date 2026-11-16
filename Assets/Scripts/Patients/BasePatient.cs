@@ -2,42 +2,74 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class BasePatient : MonoBehaviour
 {
+    [Header("Debug")]
+    [SerializeField] private Key debugRequestKey = Key.R;
+    
     [Header("Patient Requests")]
-    [SerializeField] private List<GameObject> requestableItems = new();
+    [SerializeField]
+    private List<ItemData> requestableItems = new();
 
     [Header("Request Timer")]
-    [SerializeField, Min(0.1f)] private float minRequestInterval = 5f;
-    [SerializeField, Min(0.1f)] private float maxRequestInterval = 15f;
+    [SerializeField, Min(0.1f)]
+    private float minRequestInterval = 5f;
+
+    [SerializeField, Min(0.1f)]
+    private float maxRequestInterval = 15f;
 
     [Header("Events")]
     public UnityEvent onRequestCreated;
     public UnityEvent onRequestFulfilled;
 
-    public GameObject CurrentRequest { get; private set; }
+    [Header("UI")]
+    [SerializeField] private ItemBubble itemBubble;
+
+    public ItemData CurrentRequest { get; private set; }
+
     public bool HasActiveRequest => CurrentRequest != null;
 
     private float requestTimer;
 
+    private void Awake()
+{
+    Debug.Log($"BasePatient Awake: {gameObject.name}");
+}
+
+private void OnEnable()
+{
+    Debug.Log($"BasePatient enabled: {gameObject.name}");
+}
+
+
     private void Start()
     {
+        Debug.Log($"BasePatient Start: {gameObject.name}");
+
+        if (itemBubble != null)
+        {
+            itemBubble.HideBubble();
+        }
+
         ResetRequestTimer();
     }
 
     private void Update()
     {
-        // Don't generate another request while one is active.
+        if (Keyboard.current != null &&
+        Keyboard.current[debugRequestKey].wasPressedThisFrame)
+        {
+            DebugGenerateRequest();
+        }
         if (HasActiveRequest)
             return;
 
         requestTimer -= Time.deltaTime;
 
         if (requestTimer <= 0f)
-        {
             GenerateRequest();
-        }
     }
 
     private void GenerateRequest()
@@ -63,22 +95,22 @@ public class BasePatient : MonoBehaviour
         }
 
         Debug.Log(
-            $"{gameObject.name} requests {CurrentRequest.name}"
+            $"{gameObject.name} requests {CurrentRequest.itemName}"
         );
 
         onRequestCreated?.Invoke();
     }
 
-    public bool FulfillRequest(GameObject deliveredItem)
+    public bool FulfillRequest(ItemData deliveredItem)
     {
-        if (!HasActiveRequest)
+        if (!HasActiveRequest || deliveredItem == null)
             return false;
 
         if (deliveredItem != CurrentRequest)
             return false;
 
         Debug.Log(
-            $"{gameObject.name} received {deliveredItem.name}"
+            $"{gameObject.name} received {deliveredItem.itemName}"
         );
 
         CurrentRequest = null;
@@ -101,9 +133,25 @@ public class BasePatient : MonoBehaviour
     private void OnValidate()
     {
         minRequestInterval = Mathf.Max(0.1f, minRequestInterval);
+
         maxRequestInterval = Mathf.Max(
             minRequestInterval,
             maxRequestInterval
         );
     }
+    public void DebugGenerateRequest()
+{
+    if (HasActiveRequest)
+    {
+        Debug.Log(
+            $"{gameObject.name} already has a request: " +
+            CurrentRequest.itemName
+        );
+        return;
+    }
+
+    Debug.Log($"{gameObject.name}: Debug request triggered!");
+
+    GenerateRequest();
+}
 }

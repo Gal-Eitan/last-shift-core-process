@@ -1,78 +1,173 @@
+
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 public class PlayerStats : MonoBehaviour
 {
+    [Header("UI Bars")]
+    [SerializeField] private List<GameObject> emptyBars;
 
+    [SerializeField] private GameObject EnergyBar;
+    [SerializeField] private GameObject DistanceFromDissmisalBar;
+    [SerializeField] private GameObject WakefulnessBar;
+
+    [Header("Initial Stats")]
+    [SerializeField, Range(0f, 100f)]
+    private float Energy_initial_percent = 100f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float Wakefulness_initial_percent = 100f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float DistanceFromDissmisal_initial_percent = 100f;
+
+    [Header("Drain Rates")]
+    [SerializeField, Min(0f)]
+    private float energyDrainRate = 1f;
+
+    [SerializeField, Min(0f)]
+    private float wakeFulnessDrainRate = 1f;
+
+    [Header("Input")]
     [SerializeField]
-    private List<GameObject> emptyBars;
+    private InputActionReference moveAction;
 
-    [SerializeField]
-    GameObject EnergyBar;
+    [Header("Game Over")]
+    public UnityEvent onGameOver;
 
-    [SerializeField]
-    GameObject DistanceFromDissmisalBar;
-
-    [SerializeField]
-    GameObject WakefulnessBar;
-
-    [SerializeField]
-    private float Energy_initial_percent;
-    [SerializeField]
-    private float Wakefulness_initial_percent;
-    [SerializeField]
-    private float DistanceFromDissmisal_initial_percent;
-
-
-
-
+    private bool gameOverTriggered = false;
 
     private const float BAR_HEIGHT = 20f;
-    
+
     [SerializeField]
-    private float full_bar_width;
+    private float full_bar_width = 200f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnEnable()
     {
-        emptyBars.ForEach(b=> setSize(b,full_bar_width,BAR_HEIGHT));
-        setSize(EnergyBar,full_bar_width*Energy_initial_percent/100,BAR_HEIGHT);
-        setSize(DistanceFromDissmisalBar,full_bar_width*DistanceFromDissmisal_initial_percent/100,BAR_HEIGHT);
-        setSize(WakefulnessBar,full_bar_width*Wakefulness_initial_percent/100,BAR_HEIGHT);
+        if (moveAction != null && moveAction.action != null)
+            moveAction.action.Enable();
     }
 
-
-    private void setSize(GameObject game_object_param, float width, float height)
+    private void Start()
     {
-        game_object_param.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);
+        emptyBars.ForEach(b =>
+            setSize(b, full_bar_width, BAR_HEIGHT));
+
+        setSize(EnergyBar,
+            full_bar_width * Energy_initial_percent / 100f,
+            BAR_HEIGHT);
+
+        setSize(DistanceFromDissmisalBar,
+            full_bar_width * DistanceFromDissmisal_initial_percent / 100f,
+            BAR_HEIGHT);
+
+        setSize(WakefulnessBar,
+            full_bar_width * Wakefulness_initial_percent / 100f,
+            BAR_HEIGHT);
     }
 
-    private void changeWidthByPercentOfFull(GameObject game_object_param, float percent)
+    
+private void Update()
+{
+    if (gameOverTriggered)
+        return;
+
+    if (moveAction != null && moveAction.action != null)
     {
-        float height=game_object_param.GetComponent<RectTransform>().sizeDelta.y;
+        Vector2 movement =
+            moveAction.action.ReadValue<Vector2>();
 
-        float width=game_object_param.GetComponent<RectTransform>().sizeDelta.x;
-
-        width+=full_bar_width*percent/100;
-
-Debug.Log(width);
-        if (width >= full_bar_width)
+        if (movement.sqrMagnitude > 0.0001f)
         {
-            width=full_bar_width;
-        }else if (width <= 0)
-        {
-            width=0;
+            changeWidthByPercentOfFull(
+                EnergyBar,
+                -energyDrainRate * Time.deltaTime
+            );
+
+            changeWidthByPercentOfFull(
+                WakefulnessBar,
+                -wakeFulnessDrainRate * Time.deltaTime
+            );
         }
-
-        setSize(game_object_param,width,height);
-
     }
 
-    // Update is called once per frame
-    void Update()
+    CheckGameOver();
+}
+
+
+    // Restore energy by a percentage of the full bar
+    public void RestoreEnergy(float amount)
     {
-        changeWidthByPercentOfFull(EnergyBar,-1*Time.deltaTime);
-        changeWidthByPercentOfFull(WakefulnessBar,-1*Time.deltaTime);
+        if (amount <= 0f)
+            return;
+
+        changeWidthByPercentOfFull(EnergyBar, amount);
     }
+
+    // Restore wakefulness by a percentage of the full bar
+    public void RestoreWakefulness(float amount)
+    {
+        if (amount <= 0f)
+            return;
+
+        changeWidthByPercentOfFull(WakefulnessBar, amount);
+    }
+
+    private void setSize(GameObject bar, float width, float height)
+    {
+        bar.GetComponent<RectTransform>().sizeDelta =
+            new Vector2(width, height);
+    }
+
+    private void changeWidthByPercentOfFull(GameObject bar, float percent)
+    {
+        RectTransform rect = bar.GetComponent<RectTransform>();
+
+        float width = rect.sizeDelta.x;
+        float height = rect.sizeDelta.y;
+
+        width += full_bar_width * percent / 100f;
+        width = Mathf.Clamp(width, 0f, full_bar_width);
+
+        setSize(bar, width, height);
+    }
+
+
+private void CheckGameOver()
+{
+    if (gameOverTriggered)
+        return;
+
+    float energy =
+        EnergyBar.GetComponent<RectTransform>().sizeDelta.x;
+
+    float wakefulness =
+        WakefulnessBar.GetComponent<RectTransform>().sizeDelta.x;
+
+    float dismissal =
+        DistanceFromDissmisalBar.GetComponent<RectTransform>().sizeDelta.x;
+
+    // Game over if any critical stat reaches zero
+    if (energy <= 0f ||
+        wakefulness <= 0f ||
+        dismissal <= 0f)
+    {
+        TriggerGameOver();
+    }
+}
+
+public void TriggerGameOver()
+{
+    if (gameOverTriggered)
+        return;
+
+    gameOverTriggered = true;
+
+    Debug.Log("Game Over! Player stats depleted.");
+
+    onGameOver?.Invoke();
+}
+
 }
