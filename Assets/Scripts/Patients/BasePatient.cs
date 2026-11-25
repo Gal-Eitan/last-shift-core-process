@@ -11,7 +11,7 @@ public class BasePatient : MonoBehaviour
     
     [Header("Patient Requests")]
     [SerializeField]
-    private List<ItemData> requestableItems = new();
+    private List<WeightedItem<ItemData>> requestableItems = new();
 
     [Header("Request Timer")]
     [SerializeField, Min(0.1f)]
@@ -23,6 +23,9 @@ public class BasePatient : MonoBehaviour
     [Header("Events")]
     public UnityEvent onRequestCreated;
     public UnityEvent onRequestFulfilled;
+
+    
+
 
     [Header("UI")]
     [SerializeField] private ItemBubble itemBubble;
@@ -46,6 +49,13 @@ private void OnEnable()
 
     private void Start()
     {
+        if (LiveOpsConfigManager.Instance != null)
+    {
+        LiveOpsConfigManager.Instance.OnConfigLoaded += UpdateRequestsWeightsMultipiers;
+        
+        if (LiveOpsConfigManager.Instance.CurrentConfig != null)
+            UpdateRequestsWeightsMultipiers(LiveOpsConfigManager.Instance.CurrentConfig);
+    }
         Debug.Log($"BasePatient Start: {gameObject.name}");
 
         if (itemBubble != null)
@@ -56,6 +66,11 @@ private void OnEnable()
         ResetRequestTimer();
     }
 
+    private void OnDestroy()
+    {
+        if (LiveOpsConfigManager.Instance != null)
+            LiveOpsConfigManager.Instance.OnConfigLoaded -= UpdateRequestsWeightsMultipiers;
+    }
     private void Update()
     {
         if (Keyboard.current != null &&
@@ -84,9 +99,10 @@ private void OnEnable()
             return;
         }
 
-        int index = Random.Range(0, requestableItems.Count);
+        //int index = Random.Range(0, requestableItems.Count);
 
-        CurrentRequest = requestableItems[index];
+        //CurrentRequest = requestableItems[index].item;
+        CurrentRequest=WeightedRandom.Choose<ItemData>(requestableItems);
 
         if (CurrentRequest == null)
         {
@@ -154,4 +170,20 @@ private void OnEnable()
 
     GenerateRequest();
 }
+
+    public void UpdateRequestsWeightsMultipiers(LiveConfigData data)
+    {
+        Dictionary<string,float> itemRequestsMultipier=data.activeEvent.modifiers.itemsRequestsMultiplier;
+        foreach (WeightedItem<ItemData> weightedItem in requestableItems)
+        {
+            string itemName=weightedItem.item.itemName;
+            if (itemRequestsMultipier.ContainsKey(itemName))
+            {
+                float multiplyBy=itemRequestsMultipier[itemName];
+                weightedItem.weight*=multiplyBy;
+                Debug.Log($"{itemName} request weight multiplied by {multiplyBy}");
+            }
+        }
+        
+    } 
 }

@@ -110,19 +110,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   debugRequestKey: 32
   requestableItems:
-  - {fileID: 0}
+  - item: {fileID: 11400000, guid: 6f02dc1000f8c534189288ff1cec86f5, type: 2}
+    weight: 1
+  - item: {fileID: 11400000, guid: 1f96a6e7ae6d58d4290ce29a5b68e53c, type: 2}
+    weight: 1
+  - item: {fileID: 11400000, guid: 3bde1733c0f0f5944b3bf3d96b4942d6, type: 2}
+    weight: 1
   minRequestInterval: 5
   maxRequestInterval: 15
   onRequestCreated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
+      - m_Target: {fileID: 528972156028574237}
+        m_TargetAssemblyTypeName: ItemBubble, Assembly-CSharp
+        m_MethodName: ShowBubble
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 528972156028574237}
+        m_TargetAssemblyTypeName: ItemBubble, Assembly-CSharp
+        m_MethodName: OnRequestCreated
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -130,7 +147,20 @@ MonoBehaviour:
         m_CallState: 2
   onRequestFulfilled:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 528972156028574237}
+        m_TargetAssemblyTypeName: ItemBubble, Assembly-CSharp
+        m_MethodName: HideBubble
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  itemBubble: {fileID: 0}
 --- !u!61 &2088186676512536450
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -234,6 +264,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7973664438113623297}
     m_Modifications:
+    - target: {fileID: 3528979929417590409, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
+      propertyPath: patient
+      value: 
+      objectReference: {fileID: 9181887763558224380}
+    - target: {fileID: 3528979929417590409, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
+      propertyPath: itemIcon
+      value: 
+      objectReference: {fileID: 1637218228881138816}
     - target: {fileID: 4282261047681577075, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
       propertyPath: m_Name
       value: ItemBubble
@@ -283,6 +321,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
+--- !u!114 &528972156028574237 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3528979929417590409, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
+  m_PrefabInstance: {fileID: 4012212298646879380}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 098c20ea5eabfd840906eec74a1de361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+--- !u!212 &1637218228881138816 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2384282847076538388, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
+  m_PrefabInstance: {fileID: 4012212298646879380}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7313144103152442173 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5968320653674686377, guid: 4fc863bb4742b2e4bbd4da0f05ccf01a, type: 3}
