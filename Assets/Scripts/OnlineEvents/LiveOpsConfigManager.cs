@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -147,18 +148,18 @@ public class LiveOpsConfigManager : MonoBehaviour
     }
 
     private void ParseItemsDictionary(string json, Dictionary<string, float> targetDict)
-    {
-        targetDict.Clear();
-        Match blockMatch = Regex.Match(json, "\"itemsRequestsMultiplier\"\\s*:\\s*\\{([^}]*)\\}");
-        if (!blockMatch.Success) return;
+{
+    targetDict.Clear();
+    Match blockMatch = Regex.Match(json, "\"itemsRequestsMultiplier\"\\s*:\\s*\\{([^}]*)\\}");
+    if (!blockMatch.Success) return;
 
-        MatchCollection entries = Regex.Matches(blockMatch.Groups[1].Value, "\"([^\"]+)\"\\s*:\\s*(-?\\d+)");
-        foreach (Match entry in entries)
+    MatchCollection entries = Regex.Matches(blockMatch.Groups[1].Value, "\"([^\"]+)\"\\s*:\\s*(-?\\d+(?:\\.\\d+)?)");
+    foreach (Match entry in entries)
+    {
+        if (float.TryParse(entry.Groups[2].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float multiplier))
         {
-            if (int.TryParse(entry.Groups[2].Value, out int multiplier))
-            {
-                targetDict[entry.Groups[1].Value] = multiplier;
-            }
+            targetDict[entry.Groups[1].Value] = multiplier;
         }
     }
+}
 }
