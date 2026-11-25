@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class EventDesciptionDisplayer : MonoBehaviour
 {
+    public float timeToShow = 5f;
+    private bool textLoaded=false;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -27,7 +31,16 @@ public class EventDesciptionDisplayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (textLoaded){
+            if (timeToShow > 0)
+                {
+                    timeToShow -= Time.deltaTime;
+                }
+                else
+                {
+                    gameObject.SetActive(false);
+                }
+        }
     }
 
     private void DisplayDescription(LiveConfigData config)
@@ -35,5 +48,7 @@ public class EventDesciptionDisplayer : MonoBehaviour
         string text= $"<mark=#000000>{config.activeEvent.eventTitle}</mark>";
 
         gameObject.GetComponent<TextMeshProUGUI>().SetText(text);
+        Debug.Log("title set");
+        textLoaded=true;
     }
 }

@@ -1499,7 +1499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &876918681
 SpriteRenderer:
   serializedVersion: 2
@@ -5117,7 +5117,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<mark=#000000>Your highlighted text here</mark>
+  m_text: '<mark=#000000></mark>
 
 '
   m_isRightToLeft: 0
@@ -5146,13 +5146,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 120
-  m_fontSizeBase: 120
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontSizeMin: 50
+  m_fontSizeMax: 150
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -5162,7 +5162,7 @@ MonoBehaviour:
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
+  m_charWidthMaxAdj: 50
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
@@ -5211,6 +5211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 250c5d90f0438d6479a3849dfe7d8509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  timeToShow: 5
 --- !u!1001 &1726361058
 PrefabInstance:
   m_ObjectHideFlags: 0
